@@ -3,3 +3,39 @@ LAIJIMA (Layered Interface – Injected – Macro-Areas)
 
 by: haru
 15/10/25
+
+LAIJIMA
+Il laijima è un metodo che consente di modificare parametri atmosferiche.
+Si divide in due parti, Musanaji (hardware) e Asereth (software).
+
+MUSANAJI
+Musanaji è una macchina in grado di variare un flusso d'aria. 
+In particolare ne varia la velocità. O per meglio dire ne crea una differenza di velocità, da un punto 'a' a un punto 'b'. 
+La macchina musanaji è composta da 'n' elementi tutti delle stesse dimensioni e orientati nello stesso modo. 
+Ogni elemento si comporta in questo modo: quando una corrente d'aria colpisce l'elemento, esso, in base alla propria inclinazione, varia la velocità del fluido che lo colpisce di una percentuale.
+Ipotizziamo che questo elemento sia molto sottile.
+Possiamo assumere che, quando l'elemento è parallelo al flusso d'aria (figura 1 (a)), esso viene attraversato dalla corrente senza modificare il vettore velocità. 
+Quando invece esso è perpendicolare al flusso (figura 1(b)), l'elemento produce una deviazione della corrente, con una conseguente perdita di tutta la velocità del vettore iniziale lungo la direzione iniziale. 
+Infine, quando l'elemento è inclinato di un dato angolo (figura 1(c)), il flusso viene smorzato, con conseguente perdita di una percentuale di velocità che è proporzionale all'angolo di inclinazione. 
+Oltre allo spessore (che abbiamo detto essere molto sottile), l'elemento ha un'altezza e una lunghezza. 
+Lo si può paragonare a un foglio di carta. 
+Dal punto di vista energetico, quando un flusso d'aria in movimento colpisce un ostacolo, si verifica una perdita di energia meccanica. 
+Partendo dalla formula del lavoro L=1/2mv^2, possiamo esprimere l'energia cinetica per unità di volume come E=1/2 rho*v^2, dove rho è la densità dell'aria. 
+Quando un fluido con velocità v impatta frontalmente su una parete e si ferma, l'energia cinetica si trasforma in: pressione locale, vortici e turbolenze o calore. 
+Misurando la velocità di una corrente d'aria che attraversa una conduttura, all'interno della quale sono disposti gli elementi della macchina, da un punto 'a' a un punto 'b' (figura 2), si nota che nel punto 'b' la velocità è minore rispetto ad 'a'. 
+A parità di densità si può calcolare, tramite l'equazione 1, la variazione di energia: delta E = E(a) - E(b). L'inclinazione della macchina rispetto al flusso d'aria viene determinata tramite l'uso di un anemoscopio (banderuola o timone). 
+La velocità del vento viene monitorata tramite l'uso di un anemometro. 
+Questi due strumenti sono posti alla sommità della macchina in modo analogo a quelli posti sui generatori eolici.
+Per semplicità assumiamo che la macchina possa essere solo accesa o spenta, fig.1(a) e fig.1(b), escludendo quindi tutte le possibili inclinazioni parziali (fig.1(c)). 
+Il numero di elementi contenuti nella macchina non è fisso. 
+è possibile simulare tramite codice (allegato 1) la disposizione di un numero 'n' di elementi dentro una conduttura in cui scorre una corrente avente massa volumica rho. 
+Per semplicità si trascurano alcuni calcoli più approfonditi dato che lo scopo del programma è fornire solo una rappresentazione approssimativa di uno scenario reale. 
+Ciononostante è possibile osservare che, aumentando il numero 'n' di elementi all'interno della conduttura, il coefficiente di viscosità aumenta progressivamente. 
+Tramite questa simulazione è possibile impostare i valori di velocità iniziale, densità e ampiezza degli elementi per ottenere il valore di velocità finale. 
+Sul piano pratico gli elementi vengono sospesi da terra tramite fili abbastanza resistenti da sostenere il peso degli elementi e l'azione del vento su di essi. 
+I fili vengono fissati dalla sommità della macchina a una struttura cubica (o anche altre forme) che la racchiude. 
+Questa struttura è composta da aste leggere e rigide. 
+A sua volta la struttura cubica è posta su una piattaforma in grado di ruotare meccanicamente, in base alla direzione del vento. 
+I fili vengono anche fissati alla piattaforma per garantire un certo grado di tensione. 
+Per finire la rotazione della macchina può essere controllata in questo modo: la banderuola posta in cima alla macchina identifica la direzione del vento e invia un segnale al programma che gestisce la macchina; 
+il programma a sua volta invia un segnale che ruota la macchina.
