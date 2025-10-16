@@ -1,0 +1,76 @@
+
+
+ok, ho inviato questo prompt a chatgpt:
+\
+esistono modello numerico di previsione del tempo, molto complessi. 
+ci sono anche programmi più semplici che li simulano.
+in particolare cercavo un programma simile che mi permettesse di fare questo (se ti sembra semplice puoi anche provare a farlo te): 
+dati tipo 3 o 4 o più punti, a distanze diverse tra loro, avendo dati di temperatura, velocità e direzione del vento e pressione registrati 
+in un arco di tempo su quei punti, mi calcoli i valori dei punti in uno scenario ipotetico in cui, viene posto dall'inizio un punto x, tra 
+questi punti, che rallentata la velocità del vento. 
+in teoria la velocità del vento dovrebbe essere di meno nei punti finali (i punti verso dove soffia). questo teoricamente dovrebbe provocare 
+delle variazione di pressione e alla fine i valori di pressione finale dello scenario ipotetico dovrebbero essere diversi dai valori di 
+pressione finale dello scenario di parteza.
+\
+dopo un po' di correzioni ha mandato uno script discreto.
+lo provo in un venv, metto numpy e pandas.
+mi stampa quello che aveva detto in chat:
+*screen 1*
+
+alla fine chatgpt ha detto:
+🌡️ Cosa manca rispetto a un modello meteorologico reale
+- Questo è solo un giocattolo numerico, non un modello meteorologico.
+- Manca moltissimo, ad esempio:
+- equazioni complete di Navier–Stokes per l’atmosfera
+- equazioni termodinamiche (temperatura, umidità…)
+- moto verticale, attrito, coriolis
+- schemi di advezione e diffusione accurati
+- griglia spaziale fine e 3D
+- cicli temporali multipli
+👉 Tuttavia, riproduce qualitativamente l’idea base:
+- rallentare il vento → modificare divergenza locale → modificare la pressione → propagazione dell’effetto intorno.
+
+a quel punto ho chiesto:
+ok, ipotizza che al posto del punto x in cui avviene la variazione di velocità ci sia un ostacolo, un pannello posizionato controvento su cui 
+il vento impatta. 
+quanto pensi dovrebbe essere grande questo pannello affinché provochi variazioni di pressioni paragonabili a quelle che avvengono durante un 
+operazione di cloud seeding?
+
+ma ha detto:
+servirebbero pannelli su scala chilometrica
+
+così ho corretto:
+aspe ma questo considerando che il pannello venga posto nel punto x per un tempo piccolo. ma se invece parlassimo di anni? quanti anni ci 
+vorrebbero per produrre effetti simili a un operazione di cloud seeding partendo da un pannello di dimensioni minori scelte appositamente 
+per fornire uno strumento dal costo minore del cloud seeding ma con capacità analoghe?
+
+ma mi ha detto:
+anni di un singolo pannello piccolo non fanno miracoli.
+
+così ho riprovato:
+un pannello piccolo operante per anni non trasformerà gradualmente e in modo affidabile la precipitazione come fa il cloud seeding o anche 
+variazioni di pressione. ma se invece avessimo una copertura di tanti pannelli piccoli, che magari è possibile spostare? e se li spostassimo 
+anche in funzione delle previsioni meteo per ottenere un effetto maggiore?
+
+e ha detto:
+un singolo pannello non produce effetti cumulativi nel tempo, ma molti pannelli mobili posizionati strategicamente in base alle previsioni 
+meteo potrebbero generare convergenza e sollevamento locali, amplificando in certe condizioni la formazione di nubi o supportando operazioni 
+di cloud seeding — anche se per impatti meteorologici significativi servirebbero comunque coperture molto ampie e risorse notevoli.
+
+a questo punto ho chiesto come mi aveva detto di fare belx sul gruppo di trovare i punti critici dell'idea;
+
+e ha detto che l’atmosfera tende rapidamente a riassorbire le perturbazioni, e che dispiegare migliaia di pannelli richiederebbe un costo non banale.
+e ha concluso dicendo che: 
+l’idea è teoricamente interessante per interventi locali tattici, ma debole come strategia su larga scala perché non può competere con la 
+potenza della circolazione atmosferica.
+
+poi ho chiesto (seguendo la domanda che aveva fatto cosimo):
+'quanto dovrebbe essere grande un pannello di partenza per poter ottenere qualche effetto misurabile? possibilmente economico lol. 
+è poi ha più senso un unico pannello grande in un punto o tanti pannelli piccoli al posto di quello grande? magari non disposti tutti uno accanto 
+all'altro ma anche uno di fronte all'altro'
+
+e mi ha detto che un pannello minimo ~15–30 m² potrebbe produrre un effetto misurabile su area locale. ma con 100 m² ti porti a casa delle misure 
+e comparazioni molto più evidenti.
+per la scelta se averne uno grande o tanti piccoli mi ha praticamente detto 'bo, veda lei'
+
+
