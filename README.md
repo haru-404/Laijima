@@ -5,7 +5,7 @@ by: haru
 15/10/25
 
 LAIJIMA
-Il laijima è un metodo che consente di modificare parametri atmosferiche.
+Il laijima è un metodo che punta a modificare parametri atmosferiche.
 Si divide in due parti, Musanaji (hardware) e Asereth (software).
 
 MUSANAJI
