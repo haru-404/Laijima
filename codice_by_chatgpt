@@ -1,0 +1,144 @@
+import numpy as np
+import pandas as pd
+
+# Parametri fisici semplificati
+rho = 1.2      # densità aria (kg/m^3)
+c = 340        # velocità suono (m/s)
+dt = 60        # intervallo temporale in secondi
+
+
+
+# Dati iniziali dei punti
+points = pd.DataFrame({
+    'Nome': ['A', 'B', 'C', 'D'],
+    'x': [0, 10, 0, 10],
+    'y': [0, 0, 10, 10],
+    'Pressione': [1012.0, 1011.5, 1012.3, 1011.8],
+    'Velocità': [8.0, 9.0, 7.0, 8.5],
+    'Direzione': [90, 95, 85, 92],  # in gradi da Nord
+    'Temperatura': [18.5, 19.0, 18.0, 19.2]
+})
+""" In questa prima parte abbiamo alcuni punti fissi nello spazio (coordinate x,y) con dati meteo:
+- pressione
+- velocità e direzione del vento
+- temperatura
+Questa rappresenta la condizione iniziale.
+Nella realtà, i modelli numerici del tempo partono da mappe 3D globali. 
+Qui, lo facciamo in 2D con pochi punti. """
+
+
+# Punto di perturbazione
+x_pert, y_pert = 5, 0
+vel_pert = 3.0
+""" Si crea un nuovo punto “X” tra gli altri, dove:
+il vento viene rallentato
+la pressione iniziale non è definita (verrà calcolata)
+direzione del vento impostata a 90° per semplicità
+Questo rappresenta l’intervento ipotetico che descrivevi: 
+rallentare il vento in un punto intermedio per vedere l’effetto a valle. """
+
+
+# Calcolo componenti vettoriali del vento nei punti (u est, v nord)
+points['u'] = points['Velocità'] * np.sin(np.deg2rad(points['Direzione']))  # componente Est
+points['v'] = points['Velocità'] * np.cos(np.deg2rad(points['Direzione']))  # componente Nord
+""" La direzione e velocità del vento vengono convertite in componenti cartesiane (u,v):
+u = componente verso est
+v = componente verso nord
+Questo serve per calcolare la divergenza più avanti. """
+
+
+# Aggiungo punto di perturbazione
+pert_point = {
+    'Nome': 'X',
+    'x': x_pert,
+    'y': y_pert,
+    'Pressione': np.nan,
+    'Velocità': vel_pert,
+    'Direzione': 90,
+    'Temperatura': np.nan,
+    'u': vel_pert * np.sin(np.deg2rad(90)),
+    'v': vel_pert * np.cos(np.deg2rad(90))
+}
+points = pd.concat([points, pd.DataFrame([pert_point])], ignore_index=True)
+
+# Compute divergence using weighted finite-difference like approach
+def compute_divergence_fd(points_df, x0, y0, R=20):
+    # neighbors within R excluding the center point
+    neighbors = points_df.copy()
+    dx = neighbors['x'] - x0
+    dy = neighbors['y'] - y0
+    dist = np.sqrt(dx**2 + dy**2)
+    mask = (dist > 0) & (dist < R)
+    neighbors = neighbors[mask]
+    if len(neighbors) == 0:
+        return 0.0
+    # finite-difference approximation: du/dx ~ sum(du * dx/dist^2), dv/dy ~ sum(dv * dy/dist^2)
+    u0 = points_df.loc[points_df['Nome']=='X','u'].values[0]
+    v0 = points_df.loc[points_df['Nome']=='X','v'].values[0]
+    du = neighbors['u'] - u0
+    dv = neighbors['v'] - v0
+    div = np.sum(du * (neighbors['x'] - x0) / (dist**2) + dv * (neighbors['y'] - y0) / (dist**2))
+    div = div / len(neighbors)
+    return div
+
+div_X = compute_divergence_fd(points, x_pert, y_pert, R=20)
+""" Qui entra in gioco la parte “fisica” (anche se molto semplificata):
+La divergenza è una misura di quanto il flusso d’aria esce o entra da una zona:
+se divergenza > 0 → l’aria si allontana → tendenza a calo di pressione
+se divergenza < 0 → l’aria converge → tendenza ad aumento di pressione
+Nel codice, compute_divergence_fd:
+prende i punti vicini a X
+confronta le differenze nelle componenti u e v
+fa una stima grezza della divergenza locale
+Nei veri modelli meteorologici, questa parte è fatta risolvendo equazioni differenziali 
+su una griglia tridimensionale. 
+Qui lo stimiamo con un’approssimazione a differenze finite e media pesata. """
+
+# Introduco un fattore di scala empirico per portare variazioni in ordine di pochi hPa
+scale_factor = 1e-6
+
+deltaP_X_pa = -rho * c**2 * div_X * dt * scale_factor  # in Pa
+""" Questa riga è ispirata all’equazione semplificata della continuità per un fluido comprimibile:
+(∂𝑃/∂𝑡) ≈ −𝜌𝑐^2 ∇ ⋅ 𝑉
+dove:
+ρ = densità dell’aria
+c = velocità del suono
+∇ ⋅ V = divergenza
+P = pressione
+Se l’aria rallenta in un punto, spesso si crea convergenza → aumento di pressione.
+Se accelera → divergenza → diminuzione di pressione.
+Viene poi applicato un fattore di scala empirico per mantenere le variazioni realistiche 
+(pochi hPa e non migliaia). """
+
+
+deltaP_X_hpa = deltaP_X_pa / 100.0  # convert to hPa
+
+# Propagazione semplificata della perturbazione ai punti (attenuazione esponenziale con distanza)
+new_pressures = []
+for _, p in points.iterrows():
+    if p['Nome'] == 'X':
+        P0 = np.mean(points.loc[points['Nome'] != 'X', 'Pressione'])
+        newP = P0 + deltaP_X_hpa
+    else:
+        dist = np.sqrt((p['x'] - x_pert)**2 + (p['y'] - y_pert)**2)
+        influence = np.exp(-dist / 10.0)  # attenuazione con la distanza (scale 10 km)
+        """ L’effetto della variazione di pressione al punto X viene attenuato con la distanza:
+        i punti vicini sentono di più il cambiamento
+        i punti lontani sentono meno
+        Questo simula grossolanamente la diffusione/propagazione di una perturbazione in atmosfera. """
+
+        newP = p['Pressione'] + deltaP_X_hpa * influence
+    new_pressures.append(newP)
+
+points['Nuova_Pressione'] = new_pressures
+""" Ottieni la nuova pressione in:
+- X (nuovo valore calcolato)
+- A, B, C, D (valore modificato in base alla distanza da X)
+Quindi, rallentare il vento a X ha causato una variazione della divergenza locale → che ha 
+modificato la pressione in X → che ha influenzato anche i punti vicini. """
+
+# Mostra risultati finali arrotondati
+points_result = points[['Nome','x','y','Pressione','Nuova_Pressione','Velocità','Direzione']].round(3)
+points_result
+
+print ('points_result:', points_result)
